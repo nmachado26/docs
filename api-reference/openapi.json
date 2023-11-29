@@ -1,72 +1,247 @@
 {
-  "openapi": "3.0.1",
+  "openapi": "3.0.0",
   "info": {
-    "title": "OpenAPI Plant Store",
-    "description": "A sample API that uses a plant store as an example to demonstrate features in the OpenAPI specification",
-    "license": {
-      "name": "MIT"
-    },
-    "version": "1.0.0"
+    "title": "API",
+    "description": "API",
+    "version": "3.0.0"
   },
   "servers": [
     {
-      "url": "http://sandbox.mintlify.com"
-    }
-  ],
-  "security": [
-    {
-      "bearerAuth": []
+      "url": "https://lume-terminus.com",
+      "description": "Production server"
     }
   ],
   "paths": {
-    "/plants": {
+    "/v1/create_transformation": {
       "get": {
-        "description": "Returns all plants from the system that the user has access to",
+        "summary": "Gets a transformation job",
         "parameters": [
           {
-            "name": "limit",
-            "in": "query",
-            "description": "The maximum number of results to return",
+            "name": "lume_api_key",
+            "in": "header",
+            "required": true,
+            "style": "simple",
+            "explode": false,
             "schema": {
-              "type": "integer",
-              "format": "int32"
+              "type": "string"
+            }
+          },
+          {
+            "name": "job_id",
+            "in": "query",
+            "description": "The unique identifier of the transformation job",
+            "required": true,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string"
+            },
+            "examples": {
+              "retrieve created job": {
+                "value": "d3b33102-26bf-4c23-8215-40a769d095fc"
+              }
             }
           }
         ],
         "responses": {
           "200": {
-            "description": "Plant response",
+            "description": "Ok",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Plant"
+                  "$ref": "#/components/schemas/TransformationJobResponse"
+                },
+                "examples": {
+                  "finished job": {
+                    "value": {
+                      "id": "d3b33102-26bf-4c23-8215-40a769d095fc",
+                      "user_id": "user_name",
+                      "source_data": [
+                        {
+                          "first_name": "John",
+                          "last_name": "Doe"
+                        },
+                        {
+                          "first_name": "Jane",
+                          "last_name": "Doe"
+                        }
+                      ],
+                      "target_schema": {
+                        "type": "object",
+                        "properties": {
+                          "full_name": {
+                            "type": "string",
+                            "description": "The full name of the person"
+                          }
+                        },
+                        "required": [
+                          "full_name"
+                        ]
+                      },
+                      "mapped_data": [
+                        {
+                          "full_name": "John Doe"
+                        },
+                        {
+                          "full_name": "Jane Doe"
+                        }
+                      ],
+                      "pipeline": "name_to_full_name",
+                      "status": "finished",
+                      "results": {
+                        "0": {
+                          "data": {
+                            "first_name": "John",
+                            "last_name": "Doe"
+                          },
+                          "mapped_data": {
+                            "full_name": "John Doe"
+                          },
+                          "errors": {
+                            "transformer_errors": []
+                          },
+                          "state": "transformed"
+                        },
+                        "1": {
+                          "data": {
+                            "first_name": "Jane",
+                            "last_name": "Doe"
+                          },
+                          "mapped_data": {
+                            "full_name": "Jane Doe"
+                          },
+                          "errors": {
+                            "transformer_errors": []
+                          },
+                          "state": "transformed"
+                        }
+                      },
+                      "url": "https://app.lume.ai/job?id=d3b33102-26bf-4c23-8215-40a769d095fc",
+                      "created_at": "2021-03-04T15:00:00.000Z",
+                      "updated_at": "2021-03-04T15:00:00.000Z"
+                    }
+                  },
+                  "running job": {
+                    "value": {
+                      "id": "d3b33102-26bf-4c23-8215-40a769d095fc",
+                      "user_id": "user_name",
+                      "source_data": [
+                        {
+                          "first_name": "John",
+                          "last_name": "Doe"
+                        },
+                        {
+                          "first_name": "Jane",
+                          "last_name": "Doe"
+                        }
+                      ],
+                      "target_schema": {
+                        "type": "object",
+                        "properties": {
+                          "full_name": {
+                            "type": "string",
+                            "description": "The full name of the person"
+                          }
+                        },
+                        "required": [
+                          "full_name"
+                        ]
+                      },
+                      "pipeline": "name_to_full_name",
+                      "status": "running",
+                      "results": {
+                        "0": {
+                          "data": {
+                            "first_name": "John",
+                            "last_name": "Doe"
+                          },
+                          "mapped_data": {
+                            "full_name": "John Doe"
+                          },
+                          "errors": {
+                            "transformer_errors": []
+                          },
+                          "state": "transformed"
+                        },
+                        "1": {
+                          "data": {
+                            "first_name": "Jane",
+                            "last_name": "Doe"
+                          },
+                          "mapped_data": {
+                            "full_name": "Jane Doe"
+                          },
+                          "errors": {
+                            "transformer_errors": []
+                          },
+                          "state": "running"
+                        }
+                      },
+                      "url": "https://app.lume.ai/job?id=d3b33102-26bf-4c23-8215-40a769d095fc",
+                      "created_at": "2021-03-04T15:00:00.000Z",
+                      "updated_at": "2021-03-04T15:00:00.000Z"
+                    }
                   }
                 }
               }
             }
           },
-          "400": {
-            "description": "Unexpected error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
+          "403": {
+            "description": "Forbidden"
+          },
+          "500": {
+            "description": "Internal Server Error"
           }
         }
       },
       "post": {
-        "description": "Creates a new plant in the store",
+        "summary": "Creates a transformation job and initiates pipeline creation",
+        "parameters": [
+          {
+            "name": "lume_api_key",
+            "in": "header",
+            "required": true,
+            "style": "simple",
+            "explode": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "requestBody": {
-          "description": "Plant to add to the store",
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/NewPlant"
+                "$ref": "#/components/schemas/CreateTransformationJobRequest"
+              },
+              "examples": {
+                "create a job under a new pipeline 'name_to_full_name'": {
+                  "value": {
+                    "data": [
+                      {
+                        "first_name": "John",
+                        "last_name": "Doe"
+                      },
+                      {
+                        "first_name": "Jane",
+                        "last_name": "Doe"
+                      }
+                    ],
+                    "end_model": {
+                      "type": "object",
+                      "properties": {
+                        "full_name": {
+                          "type": "string",
+                          "description": "The full name of the person"
+                        }
+                      },
+                      "required": [
+                        "full_name"
+                      ]
+                    },
+                    "pipeline": "name_to_full_name"
+                  }
+                }
               }
             }
           },
@@ -74,57 +249,197 @@
         },
         "responses": {
           "200": {
-            "description": "plant response",
+            "description": "Ok",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Plant"
+                  "$ref": "#/components/schemas/TransformationJobResponse"
+                },
+                "examples": {
+                  "immediate_comfirmation": {
+                    "value": {
+                      "id": "d3b33102-26bf-4c23-8215-40a769d095fc",
+                      "user_id": "user_name",
+                      "source_data": [
+                        {
+                          "first_name": "John",
+                          "last_name": "Doe"
+                        },
+                        {
+                          "first_name": "Jane",
+                          "last_name": "Doe"
+                        }
+                      ],
+                      "target_schema": {
+                        "type": "object",
+                        "properties": {
+                          "full_name": {
+                            "type": "string",
+                            "description": "The full name of the person"
+                          }
+                        },
+                        "required": [
+                          "full_name"
+                        ]
+                      },
+                      "pipeline": "name_to_full_name",
+                      "status": "starting",
+                      "url": "https://app.lume.ai/job?id=d3b33102-26bf-4c23-8215-40a769d095fc",
+                      "created_at": "2021-03-04T15:00:00.000Z",
+                      "updated_at": "2021-03-04T15:00:00.000Z"
+                    }
+                  }
                 }
               }
             }
           },
-          "400": {
-            "description": "unexpected error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
+          "403": {
+            "description": "Forbidden"
+          },
+          "500": {
+            "description": "Internal Server Error"
           }
         }
       }
     },
-    "/plants/{id}": {
-      "delete": {
-        "description": "Deletes a single plant based on the ID supplied",
+    "/v1/create_transformation/pipeline": {
+      "post": {
+        "summary": "Creates mapped data from source data using an existing pipeline",
         "parameters": [
           {
-            "name": "id",
-            "in": "path",
-            "description": "ID of plant to delete",
+            "name": "lume_api_key",
+            "in": "header",
             "required": true,
+            "style": "simple",
+            "explode": false,
             "schema": {
-              "type": "integer",
-              "format": "int64"
+              "type": "string"
+            }
+          },
+          {
+            "name": "pipeline",
+            "in": "query",
+            "required": true,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string"
             }
           }
         ],
-        "responses": {
-          "204": {
-            "description": "Plant deleted",
-            "content": {}
-          },
-          "400": {
-            "description": "unexpected error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UsePipelineRequest"
+              },
+              "examples": {
+                "Use created pipeline to map data": {
+                  "value": {
+                    "data": [
+                      {
+                        "first_name": "Alice",
+                        "last_name": "Smith"
+                      },
+                      {
+                        "first_name": "Bob",
+                        "last_name": "Smith"
+                      }
+                    ]
+                  }
                 }
               }
             }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TransformationJobResponse"
+                },
+                "examples": {
+                  "Get job from pipeline": {
+                    "value": {
+                      "id": "207756b2-67f9-48a0-9d25-16c63ed1e882",
+                      "user_id": "user_name",
+                      "source_data": [
+                        {
+                          "first_name": "Alice",
+                          "last_name": "Smith"
+                        },
+                        {
+                          "first_name": "Bob",
+                          "last_name": "Smith"
+                        }
+                      ],
+                      "target_schema": {
+                        "type": "object",
+                        "properties": {
+                          "full_name": {
+                            "type": "string",
+                            "description": "The full name of the person"
+                          }
+                        },
+                        "required": [
+                          "full_name"
+                        ]
+                      },
+                      "mapped_data": [
+                        {
+                          "full_name": "Alice Smith"
+                        },
+                        {
+                          "full_name": "Bob Smith"
+                        }
+                      ],
+                      "pipeline": "name_to_full_name",
+                      "status": "deployed",
+                      "results": {
+                        "0": {
+                          "data": {
+                            "first_name": "Alice",
+                            "last_name": "Smith"
+                          },
+                          "mapped_data": {
+                            "full_name": "Alice Smith"
+                          },
+                          "errors": {
+                            "transformer_errors": []
+                          },
+                          "state": "transformed"
+                        },
+                        "1": {
+                          "data": {
+                            "first_name": "Bob",
+                            "last_name": "Smith"
+                          },
+                          "mapped_data": {
+                            "full_name": "Bob Smith"
+                          },
+                          "errors": {
+                            "transformer_errors": []
+                          },
+                          "state": "transformed"
+                        }
+                      },
+                      "url": "https://app.lume.ai/job?id=207756b2-67f9-48a0-9d25-16c63ed1e882",
+                      "created_at": "2021-03-04T15:00:00.000Z",
+                      "updated_at": "2021-03-04T15:00:00.000Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "500": {
+            "description": "Internal Server Error"
           }
         }
       }
@@ -132,63 +447,227 @@
   },
   "components": {
     "schemas": {
-      "Plant": {
+      "CreateTransformationJobRequest": {
         "required": [
-          "name"
+          "data",
+          "end_model",
+          "pipeline"
         ],
         "type": "object",
         "properties": {
-          "name": {
-            "description": "The name of the plant",
-            "type": "string"
-          },
-          "tag": {
-            "description": "Tag to specify the type",
-            "type": "string"
+          "data": {},
+          "end_model": {},
+          "pipeline": {}
+        }
+      },
+      "GetTransformationJobRequest": {
+        "required": [
+          "job_id"
+        ],
+        "type": "object",
+        "properties": {
+          "job_id": {
+            "type": "string",
+            "description": "The id of the transformation job to get"
           }
         }
       },
-      "NewPlant": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/Plant"
-          },
-          {
-            "required": [
-              "id"
-            ],
-            "type": "object",
-            "properties": {
-              "id": {
-                "description": "Identification number of the plant",
-                "type": "integer",
-                "format": "int64"
-              }
-            }
-          }
-        ]
-      },
-      "Error": {
+      "TransformationJobResponse": {
         "required": [
-          "error",
-          "message"
+          "created_at",
+          "id",
+          "pipeline",
+          "source_data",
+          "status",
+          "target_schema",
+          "updated_at",
+          "user_id"
         ],
         "type": "object",
         "properties": {
-          "error": {
-            "type": "integer",
-            "format": "int32"
+          "id": {
+            "type": "string",
+            "description": "The id of the transformation job",
+            "format": "uuid4"
           },
-          "message": {
-            "type": "string"
+          "user_id": {
+            "type": "string",
+            "description": "The unique name of the user who created the transformation job"
+          },
+          "source_data": {
+            "minItems": 1,
+            "type": "array",
+            "description": "The source data",
+            "items": {
+              "type": "object"
+            }
+          },
+          "target_schema": {
+            "type": "object",
+            "description": "The target schema"
+          },
+          "mapped_data": {
+            "minItems": 1,
+            "type": "array",
+            "description": "The mapped data",
+            "nullable": true,
+            "items": {
+              "type": "object"
+            }
+          },
+          "pipeline": {
+            "type": "object",
+            "description": "The name of the pipeline this transformation job is using"
+          },
+          "status": {
+            "type": "string",
+            "description": "The status of the transformation job",
+            "enum": [
+              "starting",
+              "deployed",
+              "failed",
+              "finished",
+              "needs_review"
+            ]
+          },
+          "error": {
+            "type": "string",
+            "description": "The error message if the transformation job failed",
+            "nullable": true
+          },
+          "results": {
+            "$ref": "#/components/schemas/JobResult"
+          },
+          "to_review": {
+            "$ref": "#/components/schemas/JobResult"
+          },
+          "url": {
+            "type": "string",
+            "description": "The lume dashboard url of the transformation job"
+          },
+          "created_at": {
+            "type": "string",
+            "description": "The time the transformation job was created",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "description": "The time the transformation job was last updated",
+            "format": "date-time"
+          }
+        }
+      },
+      "UsePipelineRequest": {
+        "required": [
+          "data"
+        ],
+        "type": "object",
+        "properties": {
+          "data": {
+            "minItems": 1,
+            "type": "array",
+            "description": "The source data",
+            "items": {
+              "type": "object"
+            }
+          }
+        }
+      },
+      "JobResult": {
+        "type": "array",
+        "description": "The results of the transformation job",
+        "nullable": true,
+        "items": {
+          "$ref": "#/components/schemas/JobResult_inner"
+        }
+      },
+      "JobResult_inner": {
+        "required": [
+          "data",
+          "errors",
+          "index",
+          "mapped_data",
+          "state"
+        ],
+        "type": "object",
+        "properties": {
+          "index": {
+            "type": "string",
+            "description": "The index of this record in the source data"
+          },
+          "data": {
+            "type": "object",
+            "description": "The source data instance for this result"
+          },
+          "mapped_data": {
+            "type": "object",
+            "description": "The mapped data instance for this result"
+          },
+          "errors": {
+            "type": "object",
+            "properties": {
+              "transformer_errors": {
+                "type": "array",
+                "description": "The transformer errors for this result",
+                "items": {
+                  "required": [
+                    "errors",
+                    "source_data"
+                  ],
+                  "type": "object",
+                  "properties": {
+                    "source_data": {
+                      "type": "string",
+                      "description": "The mapped data instance for this result"
+                    },
+                    "errors": {
+                      "type": "object",
+                      "properties": {
+                        "{target_field}": {
+                          "required": [
+                            "error_message",
+                            "error_type"
+                          ],
+                          "type": "object",
+                          "properties": {
+                            "error_message": {
+                              "type": "string",
+                              "description": "The error message"
+                            },
+                            "error_type": {
+                              "type": "string",
+                              "description": "The error type"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "description": "The errors for this result"
+          },
+          "state": {
+            "type": "string",
+            "enum": [
+              "transformed",
+              "failed"
+            ]
           }
         }
       }
     },
-    "securitySchemes": {
-      "bearerAuth": {
-        "type": "http",
-        "scheme": "bearer"
+    "parameters": {
+      "lume_api_key": {
+        "name": "lume_api_key",
+        "in": "header",
+        "required": true,
+        "style": "simple",
+        "explode": false,
+        "schema": {
+          "type": "string"
+        }
       }
     }
   }

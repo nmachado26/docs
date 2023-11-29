@@ -8,16 +8,40 @@ description: 'Learn how to preview changes locally'
   higher).
 </Info>
 
-Step 1. Install Mintlify on your OS:
+Step 1. Creating a transform job:
 
 <CodeGroup>
 
-```bash npm
-npm i -g mintlify
+```python python
+def create_job(data:list, end_Install Mintlify on your OSmodel:dict, pipeline:str):
+    url = f'{base_url}/v1/create_transformation'
+    headers = {'lume_api_key': cardinal_api_key}
+    payload = {
+        "data": data,
+        "end_model": end_model,
+        "pipeline": pipeline
+    }
+    job = requests.post(url, headers=headers, json=payload).json()
+    return job
 ```
 
-```bash yarn
-yarn global add mintlify
+```javascript javascript
+async function createJob(data, endModel, pipeline) {
+    const url = `${baseUrl}/v1/create_transformation`;
+    const headers = { 'Content-Type': 'application/json', 'lume_api_key': apiKey };
+    const payload = {
+        data: data,
+        end_model: JSON.stringify(endModel),
+        pipeline: pipeline
+    };
+    const response = await fetch(url, {
+        method: 'POST',
+        headers: headers,
+        body: JSON.stringify(payload)
+    });
+    const job = await response.json();
+    return job;
+}
 ```
 
 </CodeGroup>

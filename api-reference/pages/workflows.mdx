@@ -1,0 +1,107 @@
+---
+title: 'Example Workflows'
+description: 'Example section for end to end workflows with the API'
+---
+
+<Note>
+  This page shows examples of how multiple endpoints would be used in conjunction. For per-API information, see the Introduction and Endpoints pages.
+</Note>
+
+Two examples in python and javascript. Contact your Lume POC to see how the Lume endpoint can be integrated to your specific workflow.
+
+<CodeGroup>
+
+```python python
+def send_slack_message(message):
+    """ Send a message to a Slack channel """
+
+def transform_data(data, end_model):
+
+    # Create a job
+    job = create_job(data, end_model)
+    while True:
+        status = job['status']
+        if status == 'finished':
+            return job['mapped_data']
+        elif status == 'needs_review':
+            # Custom handling of your choice
+            # Example:
+            dashboard_url = job['url']
+            send_slack_message(f'Please review the mappings at {dashboard_url} for job {job["id"]}')
+            raise Exception('Job needs review')
+        elif status == 'failed':
+            raise Exception(json.dumps(job['error']))
+        else:
+            time.sleep(5)
+            job = get_job(job['id'])
+
+    ## ...
+```
+
+```javascript javascript
+// sample data input
+const data = [
+    {
+        "id": "1234",
+        "name": "John Doe",
+    }
+]
+
+// sample end model
+const endModel = {
+    "type": "object",
+    "properties": {
+        "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The unique identifier for the company."
+          },
+          "first_name": {
+            "type": "string",
+            "description": "The first name of the person"
+          }
+    },
+    "required": [
+        "id",
+        "first_name"
+    ]
+}
+
+const apiKey = 'yourApiKeyHere'
+const baseUrl = 'https://lume-terminus.com'
+
+async function createJob(data, endModel, pipeline) {
+    const url = `${baseUrl}/v1/create_transformation`;
+    const headers = {
+        'Content-Type': 'application/json',
+        'lume_api_key': apiKey,
+    };
+
+    const payload = {
+        data: data,
+        end_model: JSON.stringify(endModel),
+        pipeline: pipeline
+    };
+
+    try {
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: headers,
+            body: JSON.stringify(payload)
+        });
+        const job = await response.json();
+        return job;
+    } catch (error) {
+        console.error('Error:', error);
+    }
+}
+
+// Replace 'yourPipelineHere' with your actual pipeline value
+createJob(data, end_model, 'yourPipelineHere').then(job => {
+    console.log(job); // Output the result
+}).catch(error => {
+    console.error(error); // Output any error
+});
+```
+
+</CodeGroup>

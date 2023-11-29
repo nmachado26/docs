@@ -1,0 +1,201 @@
+---
+title: 'Introduction'
+description: 'Automatically map data from any source to any target, allowing you to onboard clients and create data pipelines faster.'
+---
+
+
+
+<Card
+  title="Request a Demo"
+  icon="leaf"
+  href="https://www.lume.ai"
+>
+</Card>
+
+## Endpoint Examples
+
+
+<Note>
+    This section shows examples of how each API endpoint would be called in a function. Each example is separated by the core use of the endpoint.
+</Note>
+
+#### Creating a mapper
+
+<CodeGroup>
+
+```python python
+def create_job(data:list, end_Install Mintlify on your OSmodel:dict, pipeline:str):
+    url = f'{base_url}/v1/create_transformation'
+    headers = {'lume_api_key': cardinal_api_key}
+    payload = {
+        "data": data,
+        "end_model": end_model,
+        "pipeline": pipeline
+    }
+    job = requests.post(url, headers=headers, json=payload).json()
+    return job
+```
+
+```javascript javascript
+async function createJob(data, endModel, pipeline) {
+    const url = `${baseUrl}/v1/create_transformation`;
+    const headers = { 'Content-Type': 'application/json', 'lume_api_key': apiKey };
+    const payload = {
+        data: data,
+        end_model: JSON.stringify(endModel),
+        pipeline: pipeline
+    };
+    const response = await fetch(url, {
+        method: 'POST',
+        headers: headers,
+        body: JSON.stringify(payload)
+    });
+    const job = await response.json();
+    return job;
+}
+```
+
+</CodeGroup>
+
+#### Using a deployed mapper
+
+<CodeGroup>
+
+```python python
+def use_pipeline(data, pipeline):
+    url = f'{base_url}/v1/create_transformation/pipeline'
+    headers = {'lume_api_key': cardinal_api_key}
+    params= {
+        "pipeline": pipeline
+    }
+    job = requests.post(url, headers=headers,params=params, json={
+        "data": data
+    }).json()
+    return job
+
+job = use_pipeline(data, pipeline=pipeline)
+```
+
+```javascript javascript
+async function usePipeline(data, pipeline) {
+    const url = `${baseUrl}/v1/create_transformation/pipeline`;
+    const headers = {'Content-Type': 'application/json', 'lume_api_key': apiKey};
+    const params = new URLSearchParams({ pipeline }).toString();
+    const response = await fetch(`${url}?${params}`, {
+      method: 'POST',
+      headers: headers,
+      body: JSON.stringify({ data: data })
+    });
+  
+    return response.json();
+  }
+```
+
+</CodeGroup>
+
+#### Fetching Pipelines
+
+<CodeGroup>
+
+```python python
+def get_pipelines():
+    url = f'{base_url}/v1/create_transformation/pipeline'
+    headers = {'lume_api_key': api_key}
+    try:
+        response = requests.get(url, headers=headers)
+    except Exception as e:
+        print(e)
+        raise e
+
+    return response.json()
+```
+
+```javascript javascript
+async function getPipelines() {
+    const url = `${baseUrl}/v1/create_transformation/pipeline`;
+    const headers = {'lume_api_key': apiKey};
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: headers,
+    });
+  
+    return response.json();
+  }
+```
+
+</CodeGroup>
+
+response
+
+```json
+{
+     "{pipeline}": { 
+        "deployed": True/False,
+        "end_model": {},
+        "created_at": ""
+     },
+     ...
+}
+```
+
+
+#### Fetching Transformation Job
+
+<CodeGroup>
+
+```javascript javascript
+async function getTransformation(jobId) {
+    const url = `${baseUrl}/v1/create_transformation?job_id=${encodeURIComponent(jobId)}`;
+    const headers = { 'lume_api_key': apiKey };
+    const response = await fetch(url, { method: 'GET', headers: headers });
+    const job = await response.json();
+    if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    return job;
+}
+```
+
+</CodeGroup>
+
+#### Delete mapper
+
+<CodeGroup>
+
+```python python
+def delete_pipeline(pipeline_name):
+    url = f'{base_url}/v1/create_transformation/pipeline'
+    headers = {'lume_api_key': api_key}
+    params = {'pipeline': pipeline_name}
+    try:
+        response = requests.delete(url, headers=headers, params=params)
+    except Exception as e:
+        print(e)
+        raise e
+    return response.json()
+```
+
+```javascript javascript
+async function deletePipeline(pipeline) {
+    const url = `${baseUrl}/v1/create_transformation/pipeline`;
+    const headers = {'lume_api_key': apiKey};
+    const params = new URLSearchParams({ pipeline }).toString();
+    const response = await fetch(`${url}?${params}`, {
+      method: 'DELETE',
+      headers: headers,
+    });
+  
+    return response.json();
+  }
+```
+
+</CodeGroup>
+
+Response
+
+```json
+{
+    "status": success/failed,
+    "message" : ""
+}
+```
